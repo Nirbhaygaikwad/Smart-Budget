@@ -12,7 +12,8 @@ import {
   Legend,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  ResponsiveContainer
 } from 'recharts';
 import './Transactions.css';
 
@@ -278,7 +279,8 @@ const Transactions = () => {
         <div className="charts-section">
           <div className="chart-container">
             <h3>Transaction Distribution</h3>
-            <BarChart width={600} height={300} data={prepareChartData()}>
+            <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={prepareChartData()}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="category" />
               <YAxis />
@@ -286,29 +288,32 @@ const Transactions = () => {
               <Legend />
               <Bar dataKey="amount" fill="#8884d8" name="Amount" />
             </BarChart>
+            </ResponsiveContainer>
           </div>
           <div className="chart-container">
             <h3>Category Distribution</h3>
-            <PieChart width={400} height={300}>
+            <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
               <Pie
                 data={Object.entries(categoryExpenses).map(([category, amount]) => ({
                   name: category,
                   value: amount
                 }))}
-                cx={200}
-                cy={150}
+                cx="50%"
+                cy="45%"
                 labelLine={false}
-                outerRadius={100}
+                outerRadius="70%"
                 fill="#8884d8"
                 dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
               >
                 {Object.entries(categoryExpenses).map((entry, index) => (
-                  <Cell key={index} fill={`#${Math.floor(Math.random()*16777215).toString(16)}`} />
+                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip />
+              <Legend />
             </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
 

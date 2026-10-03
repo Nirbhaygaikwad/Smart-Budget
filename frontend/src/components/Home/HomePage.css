@@ -174,3 +174,57 @@ html, body {
   border-top-left-radius: 80px;
   border-top-right-radius: 80px;
 }
+
+/* Mobile */
+@media (max-width: 600px) {
+  .home-header {
+    padding: 12px 16px;
+  }
+
+  .home-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .home-logo {
+    font-size: 20px;
+  }
+
+  .home-nav-links {
+    gap: 8px;
+  }
+
+  .home-nav-links a {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .home-hero {
+    padding: 110px 16px 70px;
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+  }
+
+  .home-hero h1 {
+    font-size: 30px;
+  }
+
+  .home-features {
+    padding: 50px 16px;
+  }
+
+  .home-features h2 {
+    font-size: 28px;
+  }
+
+  .home-feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-footer {
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+  }
+}

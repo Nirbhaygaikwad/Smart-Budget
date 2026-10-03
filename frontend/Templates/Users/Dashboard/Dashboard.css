@@ -48,6 +48,7 @@
 }
 
 .chart-container {
+  min-width: 0;
   background: white;
   padding: 20px;
   border-radius: 10px;

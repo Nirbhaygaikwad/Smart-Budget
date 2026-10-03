@@ -150,6 +150,7 @@
 
 .chart-container {
   padding: 10px;
+  min-width: 0;
 }
 
 .chart-container h3 {
@@ -354,7 +355,17 @@
   margin-bottom: 20px;
 }
 
+@media (max-width: 1024px) {
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
+  .summary-section {
+    flex-direction: column;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
   }

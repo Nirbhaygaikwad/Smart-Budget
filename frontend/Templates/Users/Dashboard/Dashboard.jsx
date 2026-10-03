@@ -10,7 +10,8 @@ import {
   Legend,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  ResponsiveContainer
 } from 'recharts';
 import transactionService from '../../../src/services/transactions/transactionService';
 import './Dashboard.css';
@@ -126,7 +127,8 @@ const Dashboard = () => {
         <div className="charts-section">
           <div className="chart-container">
             <h3>Monthly Transactions</h3>
-            <BarChart width={600} height={300} data={barChartData}>
+            <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={barChartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
@@ -135,21 +137,23 @@ const Dashboard = () => {
               <Bar dataKey="Income" fill="#0088FE" />
               <Bar dataKey="Expense" fill="#FF8042" />
             </BarChart>
+            </ResponsiveContainer>
           </div>
 
           <div className="chart-container">
             <h3>Expense by Category</h3>
-            <PieChart width={400} height={300}>
+            <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
               <Pie
                 data={Object.entries(categoryExpenses).map(([name, value], index) => ({
                   name,
                   value,
                   fill: COLORS[index % COLORS.length]
                 }))}
-                cx={200}
-                cy={150}
+                cx="50%"
+                cy="45%"
                 labelLine={false}
-                outerRadius={100}
+                outerRadius="70%"
                 dataKey="value"
               >
                 {Object.entries(categoryExpenses).map((entry, index) => (
@@ -159,6 +163,7 @@ const Dashboard = () => {
               <Tooltip />
               <Legend />
             </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
 

@@ -105,11 +105,13 @@ const FinancialInsights = () => {
         categories[t.category] += parseFloat(t.amount);
       });
 
+    const total = Object.values(categories).reduce((sum, amount) => sum + amount, 0);
+
     return Object.entries(categories)
       .map(([category, amount]) => ({
         category,
         amount,
-        percentage: 0 // Will be calculated below
+        percentage: total > 0 ? (amount / total) * 100 : 0
       }))
       .sort((a, b) => b.amount - a.amount);
   };
@@ -277,7 +279,7 @@ const FinancialInsights = () => {
               {/* Category Breakdown */}
               <div className="insight-card">
                 <h3>Expense Categories</h3>
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={260}>
                   <PieChart>
                     <Pie
                       data={insights.categoryBreakdown}
@@ -285,11 +287,7 @@ const FinancialInsights = () => {
                       nameKey="category"
                       cx="50%"
                       cy="50%"
-                      outerRadius={100}
-                      label={({ name, value, percent }) => 
-                        `${name} (${(percent * 100).toFixed(1)}%)`
-                      }
-                      labelLine={{ stroke: '#666', strokeWidth: 1 }}
+                      outerRadius="85%"
                     >
                       {insights.categoryBreakdown.map((entry, index) => (
                         <Cell 
@@ -299,9 +297,22 @@ const FinancialInsights = () => {
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => formatCurrency(value)} />
-                    <Legend formatter={(value) => `${value} (${(insights.categoryBreakdown.find(item => item.category === value)?.percentage || 0).toFixed(1)}%)`} />
                   </PieChart>
                 </ResponsiveContainer>
+                <ul className="category-legend">
+                  {insights.categoryBreakdown.map((item, index) => (
+                    <li key={item.category}>
+                      <span
+                        className="legend-swatch"
+                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                      />
+                      <span className="legend-name" title={item.category}>{item.category}</span>
+                      <span className="legend-value">
+                        {formatCurrency(item.amount)} ({item.percentage.toFixed(1)}%)
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
 
               {/* Budget Performance */}

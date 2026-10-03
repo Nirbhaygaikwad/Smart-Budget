@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './DashboardLayout.css';
@@ -7,6 +7,21 @@ const DashboardLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isActive = (path) => location.pathname === path;
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  let user = null;
+  try {
+    user = JSON.parse(localStorage.getItem('user'));
+  } catch {
+    user = null;
+  }
+  const displayName = user?.username || user?.email || 'User';
+  const initial = displayName.charAt(0).toUpperCase();
+
+  // Close the mobile menu after navigating
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -43,9 +58,40 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <div className="dashboard-layout">
-      <div className="sidebar">
+      <header className="mobile-topbar">
+        <button
+          type="button"
+          className="menu-toggle"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+        <span className="mobile-brand">Smart Budget</span>
+        <div className="mobile-user" title={displayName}>
+          <span className="user-avatar">{initial}</span>
+          <span className="mobile-user-name">{displayName}</span>
+        </div>
+      </header>
+
+      {menuOpen && <div className="sidebar-backdrop" onClick={() => setMenuOpen(false)} />}
+
+      <div className={`sidebar ${menuOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <h2>Smart Budget</h2>
+        </div>
+        <div className="sidebar-user">
+          <span className="user-avatar">{initial}</span>
+          <div className="sidebar-user-info">
+            <span className="sidebar-user-label">Logged in as</span>
+            <span className="sidebar-user-name" title={displayName}>{displayName}</span>
+            {user?.email && user.email !== displayName && (
+              <span className="sidebar-user-email" title={user.email}>{user.email}</span>
+            )}
+          </div>
         </div>
         <ul className="nav-menu">
           <li>

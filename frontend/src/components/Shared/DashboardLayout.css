@@ -1,3 +1,8 @@
+.dashboard-layout {
+  min-height: 100vh;
+  background-color: #f5f6fa;
+}
+
 .dashboard-container {
   display: flex;
   min-height: 100vh;
@@ -90,28 +95,176 @@
   max-width: 1200px;
 }
 
-/* Mobile Styles */
-.sidebar-toggle {
-  display: none;
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 1000;
+/* Logged-in user */
+.user-avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0088FE 0%, #0066cc 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 20px;
   background: white;
-  border: none;
-  padding: 0.5rem;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
+}
+
+.sidebar-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar-user-label {
+  font-size: 12px;
+  color: #888;
+}
+
+.sidebar-user-name {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-user-email {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mobile Styles */
+.mobile-topbar,
+.sidebar-backdrop {
+  display: none;
 }
 
 @media (max-width: 768px) {
-  .sidebar {
-    width: 200px;
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    padding: 0 12px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    z-index: 900;
   }
-  
+
+  .menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .menu-toggle span {
+    display: block;
+    height: 2px;
+    background: #333;
+    border-radius: 2px;
+  }
+
+  .mobile-brand {
+    font-weight: 600;
+    font-size: 18px;
+    color: #333;
+    white-space: nowrap;
+  }
+
+  .mobile-user {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .mobile-user .user-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+  }
+
+  .mobile-user-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sidebar {
+    width: 260px;
+    max-width: 85vw;
+    z-index: 1000;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 950;
+  }
+
   .main-content {
-    margin-left: 200px;
-    width: calc(100% - 200px);
+    margin-left: 0;
+    width: 100%;
+    padding: 68px 12px 12px;
+  }
+
+  /* Pages already sit inside main-content's padding on small screens */
+  .main-content > div {
+    padding: 0;
+  }
+
+  /* Let wide tables scroll inside their card instead of stretching the page */
+  .main-content table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* Very narrow phones: keep the user's name, drop the brand text */
+@media (max-width: 340px) {
+  .mobile-brand {
+    display: none;
   }
 }

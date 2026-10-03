@@ -102,3 +102,13 @@ button:hover {
 .signup-link a:hover {
   text-decoration: underline;
 }
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 16px;
+  }
+
+  .login-box {
+    padding: 1.5rem;
+  }
+}
