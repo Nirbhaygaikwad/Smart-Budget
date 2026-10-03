@@ -11,7 +11,15 @@ const budgetRoute = require("./routes/budgetRouter");
 // Load env vars
 dotenv.config();
 
+// Tokens signed with a guessable fallback could be forged, so refuse to start without a secret
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is not set");
+}
+
 const app = express();
+
+// Don't advertise the server framework
+app.disable("x-powered-by");
 
 // Middleware
 // Documents are uploaded as base64 data URLs, so allow larger bodies
@@ -47,9 +55,20 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error('Error:', err);
   
-  // Keep the status a controller set with res.status() before throwing
-  const statusCode = err.statusCode || err.status || (res.statusCode >= 400 ? res.statusCode : 500);
-  const message = err.message || "Internal Server Error";
+  let statusCode = err.statusCode || err.status || (res.statusCode >= 400 ? res.statusCode : 500);
+  let message = err.message || "Internal Server Error";
+
+  if (err.name === "CastError") {
+    // Malformed ids (e.g. /documents/abc) - don't expose Mongoose internals
+    statusCode = 404;
+    message = "Resource not found";
+  } else if (err.name === "ValidationError") {
+    statusCode = 400;
+    message = Object.values(err.errors).map((e) => e.message).join(", ");
+  } else if (statusCode >= 500) {
+    // Unexpected errors are logged above; don't send their details to the client
+    message = "Internal Server Error";
+  }
   
   res.status(statusCode).json({
     status: "error",
