@@ -12,12 +12,15 @@ Built to help users **track income, expenses, financial goals,store important do
 - 🎯 Set and track financial goals
 - 📑 Generate financial reports
 - 🔔 Budget insights
+- 📈 Financial Insights page: savings rate, monthly trends, budget performance, top expenses, and an expense-category breakdown showing each category's amount and percentage
+- 👤 Logged-in user's name and email shown in the navigation panel, so it's clear whose account is open
+- 📱 Mobile-friendly layout: on phones the sidebar becomes a slide-in menu behind a top bar, charts resize to fit the screen, and wide tables scroll inside their cards
 - 🔐 Secure token-based API calls
 
 ---
 
 ## 🛠️ Tech Stack
-**Frontend:** React, Redux Toolkit, TailwindCSS, Vite  
+**Frontend:** React, Redux Toolkit, Recharts, TailwindCSS, Vite  
 **Backend:** Node.js, Express.js  
 **Database:** MongoDB (MongoDB Atlas in production)  
 **Hosting:** Vercel (frontend and backend as two projects)
@@ -103,6 +106,13 @@ The frontend calls `http://localhost:8000/api/v1` by default. To point it at a d
 ```env
 VITE_API_URL=https://your-api.example.com/api/v1
 ```
+
+### 5. Lint the frontend
+```bash
+cd frontend
+npm run lint
+```
+This should finish with no errors or warnings. Keep it that way before pushing.
 
 ---
 
