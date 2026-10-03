@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import DashboardLayout from '../Shared/DashboardLayout';
 import {
@@ -35,6 +35,8 @@ const FinancialInsights = () => {
 
   useEffect(() => {
     loadInsights();
+    // Load once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadInsights = async () => {

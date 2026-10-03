@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import DashboardLayout from '../Shared/DashboardLayout';
 import transactionService from '../../services/transactions/transactionService';
@@ -84,7 +84,7 @@ const TransactionsPage = () => {
         await transactionService.deleteTransaction(id);
         toast.success('Transaction deleted successfully');
         fetchTransactions();
-      } catch (error) {
+      } catch {
         toast.error('Failed to delete transaction');
       }
     }

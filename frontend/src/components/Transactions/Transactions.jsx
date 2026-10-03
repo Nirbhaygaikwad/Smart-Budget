@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardLayout from '../Shared/DashboardLayout';
 import { toast } from 'react-toastify';
 import transactionService from '../../services/transactions/transactionService';
@@ -27,7 +27,6 @@ const Transactions = () => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [categoryExpenses, setCategoryExpenses] = useState({});
-  const [selectedType, setSelectedType] = useState('expense');
   const [loading, setLoading] = useState(true);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [formData, setFormData] = useState({
@@ -42,6 +41,8 @@ const Transactions = () => {
 
   useEffect(() => {
     fetchTransactions();
+    // Load once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchTransactions = async () => {
@@ -81,10 +82,6 @@ const Transactions = () => {
     setTotalIncome(income);
     setTotalExpense(expense);
     setCategoryExpenses(categories);
-  };
-
-  const handleTypeChange = (e) => {
-    setSelectedType(e.target.value);
   };
 
   const handleChange = (e) => {

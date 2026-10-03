@@ -38,7 +38,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await login(formData);
+      await login(formData);
       toast.success("Login successful!");
       navigate("/dashboard");
     } catch (err) {
@@ -86,7 +86,7 @@ const Login = () => {
           </button>
         </form>
         <p className="signup-link">
-          Don't have an account? <Link to="/register">Register</Link>
+          Don&apos;t have an account? <Link to="/register">Register</Link>
         </p>
       </div>
     </div>

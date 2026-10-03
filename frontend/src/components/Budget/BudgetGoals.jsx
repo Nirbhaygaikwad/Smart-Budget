@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import DashboardLayout from '../Shared/DashboardLayout';
 import {
@@ -23,7 +23,6 @@ const BudgetGoals = () => {
   const [budgetGoals, setBudgetGoals] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [editingGoal, setEditingGoal] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [availableMonths, setAvailableMonths] = useState([]);
 
   useEffect(() => {
@@ -59,8 +58,6 @@ const BudgetGoals = () => {
     } catch (error) {
       console.error('Error loading budget goals:', error);
       toast.error('Error loading budget goals');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -184,7 +181,7 @@ const BudgetGoals = () => {
       });
   };
 
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (

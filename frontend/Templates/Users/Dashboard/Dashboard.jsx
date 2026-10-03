@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardLayout from '../../../src/components/Shared/DashboardLayout';
 import {
   BarChart,
@@ -32,6 +32,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadTransactions();
+    // Load once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadTransactions = async () => {
@@ -90,12 +92,6 @@ const Dashboard = () => {
     month,
     Income: data.income,
     Expense: data.expense
-  }));
-
-  const categoryData = Object.entries(categoryExpenses).map(([name, value], index) => ({
-    name,
-    value,
-    color: COLORS[index % COLORS.length]
   }));
 
   if (loading) {

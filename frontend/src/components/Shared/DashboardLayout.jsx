@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './DashboardLayout.css';
 
 const DashboardLayout = ({ children }) => {
   const location = useLocation();
-  const navigate = useNavigate();
   const isActive = (path) => location.pathname === path;
   const [menuOpen, setMenuOpen] = useState(false);
 

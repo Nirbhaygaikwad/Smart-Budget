@@ -1,4 +1,3 @@
-import React from "react";
 
 const AuthRoute = ({ children }) => {
   const isAuthenticated = true; // Dummy authentication check
