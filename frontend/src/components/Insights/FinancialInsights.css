@@ -26,7 +26,7 @@
   margin-top: 20px;
 }
 
-.summary-card {
+.insights-page .summary-card {
   background: linear-gradient(135deg, #0088FE 0%, #0066cc 100%);
   color: white;
   padding: 20px;
@@ -35,7 +35,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.summary-card h3 {
+.insights-page .summary-card h3 {
   margin: 0 0 10px;
   font-size: 18px;
   opacity: 0.9;
@@ -43,7 +43,7 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.summary-card .rate {
+.insights-page .summary-card .rate {
   font-size: 32px;
   font-weight: 700;
   margin: 0;
@@ -52,7 +52,7 @@
   letter-spacing: 0.5px;
 }
 
-.summary-card .description {
+.insights-page .summary-card .description {
   margin: 8px 0 0;
   font-size: 14px;
   opacity: 0.9;
@@ -224,7 +224,7 @@
     min-height: auto;
   }
   
-  .summary-card .rate {
+  .insights-page .summary-card .rate {
     font-size: 28px;
   }
 }
