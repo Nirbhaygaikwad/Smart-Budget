@@ -114,6 +114,18 @@ npm run lint
 ```
 This should finish with no errors or warnings. Keep it that way before pushing.
 
+Components validate their props with [prop-types](https://www.npmjs.com/package/prop-types), and the `react/prop-types` lint rule is on. When you add or change a component's props, declare them on the component:
+```jsx
+import PropTypes from 'prop-types';
+
+const AlertMessage = ({ message }) => <div className="alert">{message}</div>;
+
+AlertMessage.propTypes = {
+  message: PropTypes.node.isRequired,
+};
+```
+Lint flags any prop a component uses without declaring it. The declarations are checked by lint only: this project uses React 19, which no longer validates `propTypes` in the browser, so a prop of the wrong type won't produce a console warning.
+
 ---
 
 ## 🍃 Setting Up MongoDB Atlas
