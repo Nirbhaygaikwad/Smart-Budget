@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
 import './DashboardLayout.css';
 
 const DashboardLayout = ({ children }) => {
@@ -128,6 +129,10 @@ const DashboardLayout = ({ children }) => {
       </main>
     </div>
   );
+};
+
+DashboardLayout.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export default DashboardLayout;

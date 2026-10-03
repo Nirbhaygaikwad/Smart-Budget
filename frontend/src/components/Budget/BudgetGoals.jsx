@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { getBudgets, createBudget, updateBudget, deleteBudget } from '../../services/budgets/budgetService';
 import transactionService from '../../services/transactions/transactionService';
+import PropTypes from 'prop-types';
 import './BudgetGoals.css';
 
 const CATEGORIES = {
@@ -195,6 +196,21 @@ const BudgetGoals = () => {
       );
     }
     return null;
+  };
+
+  CustomTooltip.propTypes = {
+    active: PropTypes.bool,
+    payload: PropTypes.arrayOf(
+      PropTypes.shape({
+        payload: PropTypes.shape({
+          tooltipName: PropTypes.string,
+          budget: PropTypes.number,
+          spent: PropTypes.number,
+          remaining: PropTypes.number,
+          percentage: PropTypes.string,
+        }),
+      })
+    ),
   };
 
   return (

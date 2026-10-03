@@ -18,6 +18,7 @@ import {
 } from 'recharts';
 import transactionService from '../../services/transactions/transactionService';
 import { getBudgets } from '../../services/budgets/budgetService';
+import PropTypes from 'prop-types';
 import './FinancialInsights.css';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#FF4D4D', '#82ca9d', '#ffc658'];
@@ -232,6 +233,18 @@ const FinancialInsights = () => {
       );
     }
     return null;
+  };
+
+  CustomTooltip.propTypes = {
+    active: PropTypes.bool,
+    payload: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string,
+        value: PropTypes.number,
+        color: PropTypes.string,
+      })
+    ),
+    label: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   };
 
   return (

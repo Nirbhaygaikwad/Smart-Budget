@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { getCurrentUser } from "../services/users/userService";
+import PropTypes from "prop-types";
 
 const ProtectedRoute = ({ children }) => {
   const user = getCurrentUser();
@@ -10,6 +11,10 @@ const ProtectedRoute = ({ children }) => {
   }
 
   return children;
+};
+
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export default ProtectedRoute;
