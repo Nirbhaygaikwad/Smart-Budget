@@ -7,7 +7,7 @@ const goalController = {
     const { name, targetAmount, deadline, description } = req.body;
 
     const goal = await Goal.create({
-      user: req.user.id,
+      user: req.user,
       name,
       targetAmount,
       deadline,
@@ -24,7 +24,7 @@ const goalController = {
 
   // Get all goals for a user
   getAll: asyncHandler(async (req, res) => {
-    const goals = await Goal.find({ user: req.user.id })
+    const goals = await Goal.find({ user: req.user })
       .sort({ deadline: 1 });
 
     // Calculate progress statistics
@@ -62,7 +62,7 @@ const goalController = {
     const { name, targetAmount, currentAmount, deadline, description, status } = req.body;
 
     const goal = await Goal.findOneAndUpdate(
-      { _id: id, user: req.user.id },
+      { _id: id, user: req.user },
       { name, targetAmount, currentAmount, deadline, description, status },
       { new: true, runValidators: true }
     );
@@ -84,7 +84,7 @@ const goalController = {
 
     const goal = await Goal.findOneAndDelete({
       _id: id,
-      user: req.user.id,
+      user: req.user,
     });
 
     if (!goal) {
@@ -103,7 +103,7 @@ const goalController = {
     const { id } = req.params;
     const { amount } = req.body;
 
-    const goal = await Goal.findOne({ _id: id, user: req.user.id });
+    const goal = await Goal.findOne({ _id: id, user: req.user });
 
     if (!goal) {
       res.status(404);

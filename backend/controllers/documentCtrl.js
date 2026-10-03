@@ -7,7 +7,7 @@ const documentController = {
     const { title, description, fileUrl, fileType, fileSize } = req.body;
 
     const document = await Document.create({
-      user: req.user.id,
+      user: req.user,
       title,
       description,
       fileUrl,
@@ -24,7 +24,7 @@ const documentController = {
 
   // Get all documents for a user
   getAll: asyncHandler(async (req, res) => {
-    const documents = await Document.find({ user: req.user.id })
+    const documents = await Document.find({ user: req.user })
       .sort({ uploadDate: -1 });
 
     // Get storage statistics
@@ -64,7 +64,7 @@ const documentController = {
 
     const document = await Document.findOne({
       _id: id,
-      user: req.user.id
+      user: req.user
     });
 
     if (!document) {
@@ -84,7 +84,7 @@ const documentController = {
     const { title, description } = req.body;
 
     const document = await Document.findOneAndUpdate(
-      { _id: id, user: req.user.id },
+      { _id: id, user: req.user },
       { title, description },
       { new: true, runValidators: true }
     );
@@ -106,7 +106,7 @@ const documentController = {
 
     const document = await Document.findOneAndDelete({
       _id: id,
-      user: req.user.id,
+      user: req.user,
     });
 
     if (!document) {

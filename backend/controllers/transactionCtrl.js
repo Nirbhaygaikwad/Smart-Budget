@@ -7,7 +7,7 @@ const transactionController = {
     const { type, amount, category, description, date } = req.body;
 
     const transaction = await Transaction.create({
-      user: req.user.id,
+      user: req.user,
       type,
       amount,
       category,
@@ -23,7 +23,7 @@ const transactionController = {
 
   // Get all transactions for a user
   getAll: asyncHandler(async (req, res) => {
-    const transactions = await Transaction.find({ user: req.user.id })
+    const transactions = await Transaction.find({ user: req.user })
       .sort({ date: -1 });
 
     // Calculate totals
@@ -85,7 +85,7 @@ const transactionController = {
     const { type, amount, category, description, date } = req.body;
 
     const transaction = await Transaction.findOneAndUpdate(
-      { _id: id, user: req.user.id },
+      { _id: id, user: req.user },
       { type, amount, category, description, date },
       { new: true, runValidators: true }
     );
@@ -107,7 +107,7 @@ const transactionController = {
 
     const transaction = await Transaction.findOneAndDelete({
       _id: id,
-      user: req.user.id,
+      user: req.user,
     });
 
     if (!transaction) {
