@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { BASE_URL } from '../../utils/url';
 
-const API_URL = 'http://localhost:8000/api/v1/goals';
+const API_URL = `${BASE_URL}/goals`;
 
 // Create new goal
 export const createGoal = async (goalData) => {

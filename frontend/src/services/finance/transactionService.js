@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { BASE_URL } from '../../utils/url';
 
-const API_URL = 'http://localhost:8000/api/v1/transactions';
+const API_URL = `${BASE_URL}/transactions`;
 
 // Create new transaction
 export const createTransaction = async (transactionData) => {

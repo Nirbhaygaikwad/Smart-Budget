@@ -1,9 +1,10 @@
 // src/services/transactions/transactionService.js
 import axios from 'axios';
+import { BASE_URL } from '../../utils/url';
 
 // Create axios instance
 const API = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: BASE_URL,
   withCredentials: true, // if using cookies/auth
 });
 

@@ -16,6 +16,16 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Ensure the database is connected before handling any request
+app.use(async (req, res, next) => {
+  try {
+    await dbConnect();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Routes
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/transactions", transactionRoute);
@@ -46,19 +56,18 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 8000;
 
-// Connect to database then start server
-const startServer = async () => {
-  try {
-    await dbConnect();
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+// Start a local server only when run directly (Vercel imports the app instead)
+if (require.main === module) {
+  dbConnect()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+      });
+    })
+    .catch((error) => {
+      console.error('Failed to start server:', error);
+      process.exit(1);
     });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-};
-
-startServer();
+}
 
 module.exports = app;

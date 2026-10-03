@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { BASE_URL } from '../../utils/url';
 
 // ✅ Async Thunk for Login API Call
 export const loginUser = createAsyncThunk(
@@ -7,7 +8,7 @@ export const loginUser = createAsyncThunk(
   async (values, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/v1/users/login",
+        `${BASE_URL}/users/login`,
         values,
         { 
           headers: { 
