@@ -16,6 +16,8 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import transactionService from '../../services/transactions/transactionService';
+import { getBudgets } from '../../services/budgets/budgetService';
 import './FinancialInsights.css';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#FF4D4D', '#82ca9d', '#ffc658'];
@@ -35,17 +37,14 @@ const FinancialInsights = () => {
     loadInsights();
   }, []);
 
-  const loadInsights = () => {
+  const loadInsights = async () => {
     try {
-      const currentUser = JSON.parse(localStorage.getItem('user'));
-      if (!currentUser) {
-        setLoading(false);
-        return;
-      }
-
       // Load transactions and budget goals
-      const transactions = JSON.parse(localStorage.getItem(`transactions_${currentUser.id}`) || '[]');
-      const budgetGoals = JSON.parse(localStorage.getItem(`budget_goals_${currentUser.id}`) || '[]');
+      const [transactionsResponse, budgetGoals] = await Promise.all([
+        transactionService.getAllTransactions(),
+        getBudgets()
+      ]);
+      const transactions = transactionsResponse?.data?.transactions || [];
 
       // Calculate insights
       const calculatedInsights = {

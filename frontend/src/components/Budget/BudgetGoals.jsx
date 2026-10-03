@@ -11,6 +11,8 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import { getBudgets, createBudget, updateBudget, deleteBudget } from '../../services/budgets/budgetService';
+import transactionService from '../../services/transactions/transactionService';
 import './BudgetGoals.css';
 
 const CATEGORIES = {
@@ -19,6 +21,7 @@ const CATEGORIES = {
 
 const BudgetGoals = () => {
   const [budgetGoals, setBudgetGoals] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [editingGoal, setEditingGoal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [availableMonths, setAvailableMonths] = useState([]);
@@ -45,34 +48,27 @@ const BudgetGoals = () => {
     setAvailableMonths(months);
   };
 
-  const loadBudgetGoals = () => {
+  const loadBudgetGoals = async () => {
     try {
-      const currentUser = localStorage.getItem('user');
-      if (!currentUser) {
-        setLoading(false);
-        return;
-      }
-
-      const userBudgetKey = `budget_goals_${JSON.parse(currentUser).id}`;
-      const storedBudgets = localStorage.getItem(userBudgetKey);
-      
-      if (storedBudgets) {
-        setBudgetGoals(JSON.parse(storedBudgets));
-      }
-      setLoading(false);
+      const [budgets, transactionsResponse] = await Promise.all([
+        getBudgets(),
+        transactionService.getAllTransactions()
+      ]);
+      setBudgetGoals(budgets);
+      setTransactions(transactionsResponse?.data?.transactions || []);
     } catch (error) {
       console.error('Error loading budget goals:', error);
       toast.error('Error loading budget goals');
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
-    
+
     const newGoal = {
-      _id: editingGoal ? editingGoal._id : Date.now(),
       category: form.category.value,
       amount: parseFloat(form.amount.value),
       month: form.month.value
@@ -86,9 +82,9 @@ const BudgetGoals = () => {
 
     // Check if budget goal already exists for this month and category
     const existingGoal = budgetGoals.find(
-      goal => goal.month === newGoal.month && 
+      goal => goal.month === newGoal.month &&
       goal.category === newGoal.category &&
-      goal._id !== newGoal._id
+      goal._id !== editingGoal?._id
     );
 
     if (existingGoal) {
@@ -96,26 +92,22 @@ const BudgetGoals = () => {
       return;
     }
 
-    let updatedGoals;
-    if (editingGoal) {
-      updatedGoals = budgetGoals.map(goal => 
-        goal._id === editingGoal._id ? newGoal : goal
-      );
-      toast.success('Budget goal updated successfully');
-    } else {
-      updatedGoals = [...budgetGoals, newGoal];
-      toast.success('Budget goal added successfully');
+    try {
+      if (editingGoal) {
+        const updated = await updateBudget(editingGoal._id, newGoal);
+        setBudgetGoals(budgetGoals.map(goal => goal._id === updated._id ? updated : goal));
+        toast.success('Budget goal updated successfully');
+      } else {
+        const created = await createBudget(newGoal);
+        setBudgetGoals([...budgetGoals, created]);
+        toast.success('Budget goal added successfully');
+      }
+
+      setEditingGoal(null);
+      form.reset();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Error saving budget goal');
     }
-
-    setBudgetGoals(updatedGoals);
-    
-    // Save to localStorage
-    const currentUser = JSON.parse(localStorage.getItem('user'));
-    const userBudgetKey = `budget_goals_${currentUser.id}`;
-    localStorage.setItem(userBudgetKey, JSON.stringify(updatedGoals));
-
-    setEditingGoal(null);
-    form.reset();
   };
 
   const handleEdit = (goal) => {
@@ -127,29 +119,18 @@ const BudgetGoals = () => {
     form.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleDelete = (id) => {
-    const updatedGoals = budgetGoals.filter(goal => goal._id !== id);
-    setBudgetGoals(updatedGoals);
-
-    // Save to localStorage
-    const currentUser = JSON.parse(localStorage.getItem('user'));
-    const userBudgetKey = `budget_goals_${currentUser.id}`;
-    localStorage.setItem(userBudgetKey, JSON.stringify(updatedGoals));
-
-    toast.success('Budget goal deleted successfully');
+  const handleDelete = async (id) => {
+    try {
+      await deleteBudget(id);
+      setBudgetGoals(budgetGoals.filter(goal => goal._id !== id));
+      toast.success('Budget goal deleted successfully');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Error deleting budget goal');
+    }
   };
 
   const calculateProgress = (goal) => {
     try {
-      const currentUser = JSON.parse(localStorage.getItem('user'));
-      const userTransactionsKey = `transactions_${currentUser.id}`;
-      const storedTransactions = localStorage.getItem(userTransactionsKey);
-      
-      if (!storedTransactions) {
-        return { spent: 0, remaining: goal.amount, percentage: 0 };
-      }
-
-      const transactions = JSON.parse(storedTransactions);
       const monthStart = new Date(goal.month + '-01');
       const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
 

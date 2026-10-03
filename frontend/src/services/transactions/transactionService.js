@@ -5,7 +5,6 @@ import { BASE_URL } from '../../utils/url';
 // Create axios instance
 const API = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // if using cookies/auth
 });
 
 // Add token to requests
@@ -22,7 +21,7 @@ const transactionService = {
   // Create new transaction
   createTransaction: async (transactionData) => {
     try {
-      const response = await API.post('/transactions/create', transactionData);
+      const response = await API.post('/transactions', transactionData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -32,7 +31,7 @@ const transactionService = {
   // Get all transactions with summary
   getAllTransactions: async () => {
     try {
-      const response = await API.get('/transactions/lists');
+      const response = await API.get('/transactions');
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -42,7 +41,7 @@ const transactionService = {
   // Update transaction
   updateTransaction: async (id, transactionData) => {
     try {
-      const response = await API.put(`/transactions/update/${id}`, transactionData);
+      const response = await API.put(`/transactions/${id}`, transactionData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -52,7 +51,7 @@ const transactionService = {
   // Delete transaction
   deleteTransaction: async (id) => {
     try {
-      const response = await API.delete(`/transactions/delete/${id}`);
+      const response = await API.delete(`/transactions/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;

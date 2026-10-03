@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../Shared/DashboardLayout';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import transactionService from '../../services/transactions/transactionService';
 import {
   BarChart,
   Bar,
@@ -45,30 +45,14 @@ const Transactions = () => {
 
   const fetchTransactions = async () => {
     try {
-      const currentUser = localStorage.getItem('user');
-      if (!currentUser) {
-        setLoading(false);
-        return;
-      }
+      const response = await transactionService.getAllTransactions();
+      const transactionsData = response?.data?.transactions || [];
 
-      const userTransactionsKey = `transactions_${JSON.parse(currentUser).id}`;
-      const storedTransactions = localStorage.getItem(userTransactionsKey);
-      let transactionsData = [];
-      
-      if (storedTransactions) {
-        transactionsData = JSON.parse(storedTransactions);
-      }
-
-      // Sort transactions by date in descending order (most recent first)
-      const sortedTransactions = transactionsData.sort((a, b) => 
-        new Date(b.date) - new Date(a.date)
-      );
-
-      setTransactions(sortedTransactions);
-      calculateSummary(sortedTransactions);
-      setLoading(false);
+      setTransactions(transactionsData);
+      calculateSummary(transactionsData);
     } catch (error) {
-      toast.error('Error fetching transactions');
+      toast.error(error?.message || 'Error fetching transactions');
+    } finally {
       setLoading(false);
     }
   };
@@ -124,45 +108,23 @@ const Transactions = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const currentUser = JSON.parse(localStorage.getItem('user'));
-      if (!currentUser) {
-        toast.error('Please log in to add transactions');
-        return;
-      }
-
       const transactionData = {
-        _id: editingTransaction ? editingTransaction._id : Date.now(),
         type: formData.type,
         amount: parseFloat(formData.amount),
         category: formData.category,
         description: formData.description,
-        date: formData.date,
-        userId: currentUser.id
+        date: formData.date
       };
 
-      const userTransactionsKey = `transactions_${currentUser.id}`;
-      let existingTransactions = [];
-      const storedTransactions = localStorage.getItem(userTransactionsKey);
-      
-      if (storedTransactions) {
-        existingTransactions = JSON.parse(storedTransactions);
-      }
-
-      let updatedTransactions;
       if (editingTransaction) {
-        updatedTransactions = existingTransactions.map(t => 
-          t._id === editingTransaction._id ? transactionData : t
-        );
+        await transactionService.updateTransaction(editingTransaction._id, transactionData);
         toast.success('Transaction updated successfully');
       } else {
-        updatedTransactions = [...existingTransactions, transactionData];
+        await transactionService.createTransaction(transactionData);
         toast.success('Transaction added successfully');
       }
 
-      localStorage.setItem(userTransactionsKey, JSON.stringify(updatedTransactions));
-      
-      setTransactions(updatedTransactions);
-      calculateSummary(updatedTransactions);
+      await fetchTransactions();
       setEditingTransaction(null);
       setFormData({
         type: '',
@@ -172,21 +134,20 @@ const Transactions = () => {
         date: ''
       });
     } catch (error) {
-      toast.error('Error saving transaction');
+      toast.error(error?.message || 'Error saving transaction');
     }
   };
 
-  const handleDelete = (id) => {
-    const updatedTransactions = transactions.filter(t => t._id !== id);
-    setTransactions(updatedTransactions);
-    calculateSummary(updatedTransactions);
-
-    // Store transactions with user-specific key
-    const currentUser = JSON.parse(localStorage.getItem('user'));
-    const userTransactionsKey = `transactions_${currentUser.id}`;
-    localStorage.setItem(userTransactionsKey, JSON.stringify(updatedTransactions));
-
-    toast.success('Transaction deleted successfully');
+  const handleDelete = async (id) => {
+    try {
+      await transactionService.deleteTransaction(id);
+      const updatedTransactions = transactions.filter(t => t._id !== id);
+      setTransactions(updatedTransactions);
+      calculateSummary(updatedTransactions);
+      toast.success('Transaction deleted successfully');
+    } catch (error) {
+      toast.error(error?.message || 'Error deleting transaction');
+    }
   };
 
   // Prepare chart data by consolidating same categories

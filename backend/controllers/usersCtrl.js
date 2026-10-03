@@ -50,7 +50,7 @@ const usersController = {
         },
       });
     } catch (error) {
-      res.status(error.status || 500);
+      res.status(error.status || (res.statusCode >= 400 ? res.statusCode : 500));
       throw error;
     }
   }),
@@ -101,7 +101,7 @@ const usersController = {
       });
     } catch (error) {
       console.error("Login error:", error);
-      res.status(error.status || 500);
+      res.status(error.status || (res.statusCode >= 400 ? res.statusCode : 500));
       throw error;
     }
   }),
@@ -123,7 +123,7 @@ const usersController = {
         },
       });
     } catch (error) {
-      res.status(error.status || 500);
+      res.status(error.status || (res.statusCode >= 400 ? res.statusCode : 500));
       throw error;
     }
   }),

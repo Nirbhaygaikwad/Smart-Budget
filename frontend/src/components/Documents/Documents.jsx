@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import DashboardLayout from '../Shared/DashboardLayout';
+import { getDocuments, getDocument, uploadDocument, deleteDocument } from '../../services/documents/documentService';
 import './Documents.css';
+
+// Uploads are sent as base64 (about 4/3 of the file size) and Vercel limits request bodies to 4.5MB
+const MAX_FILE_SIZE = 3 * 1024 * 1024;
 
 const Documents = () => {
   const [documents, setDocuments] = useState([]);
@@ -11,82 +15,48 @@ const Documents = () => {
     loadDocuments();
   }, []);
 
-  const loadDocuments = () => {
+  const loadDocuments = async () => {
     try {
-      const currentUser = localStorage.getItem('user');
-      if (!currentUser) {
-        setLoading(false);
-        return;
-      }
-
-      const userDocsKey = `documents_${JSON.parse(currentUser).id}`;
-      const storedDocs = localStorage.getItem(userDocsKey);
-      
-      if (storedDocs) {
-        setDocuments(JSON.parse(storedDocs));
-      }
-      setLoading(false);
+      setDocuments(await getDocuments());
     } catch (error) {
       console.error('Error loading documents:', error);
       toast.error('Error loading documents');
+    } finally {
       setLoading(false);
     }
   };
 
   const handleFileUpload = async (e) => {
-    const files = e.target.files;
+    const input = e.target;
+    const files = Array.from(input.files);
     if (!files.length) return;
 
-    const currentUser = JSON.parse(localStorage.getItem('user'));
-    if (!currentUser) {
-      toast.error('Please log in to upload documents');
-      return;
-    }
-
-    try {
-      const newDocs = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-          toast.error(`File ${file.name} is too large. Maximum size is 5MB`);
-          continue;
-        }
-
-        const base64 = await convertToBase64(file);
-        const doc = {
-          id: Date.now() + i,
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          content: base64,
-          uploadDate: new Date().toISOString()
-        };
-        newDocs.push(doc);
+    let uploaded = 0;
+    for (const file of files) {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`File ${file.name} is too large. Maximum size is 3MB`);
+        continue;
       }
 
-      const updatedDocs = [...documents, ...newDocs];
-      setDocuments(updatedDocs);
-
-      const userDocsKey = `documents_${currentUser.id}`;
-      localStorage.setItem(userDocsKey, JSON.stringify(updatedDocs));
-
-      toast.success('Documents uploaded successfully');
-      e.target.value = null; // Reset file input
-    } catch (error) {
-      console.error('Error uploading documents:', error);
-      toast.error('Error uploading documents');
+      try {
+        const content = await convertToBase64(file);
+        const doc = await uploadDocument({ name: file.name, type: file.type, size: file.size, content });
+        setDocuments(prev => [doc, ...prev]);
+        uploaded++;
+      } catch (error) {
+        console.error('Error uploading document:', error);
+        toast.error(error.response?.data?.message || `Error uploading ${file.name}`);
+      }
     }
+
+    if (uploaded) toast.success('Documents uploaded successfully');
+    input.value = null; // Reset file input
   };
 
-  const handleDelete = (docId) => {
+  const handleDelete = async (docId) => {
     try {
-      const updatedDocs = documents.filter(doc => doc.id !== docId);
-      setDocuments(updatedDocs);
-
-      const currentUser = JSON.parse(localStorage.getItem('user'));
-      const userDocsKey = `documents_${currentUser.id}`;
-      localStorage.setItem(userDocsKey, JSON.stringify(updatedDocs));
-
+      await deleteDocument(docId);
+      setDocuments(documents.filter(doc => doc._id !== docId));
       toast.success('Document deleted successfully');
     } catch (error) {
       console.error('Error deleting document:', error);
@@ -94,12 +64,12 @@ const Documents = () => {
     }
   };
 
-  const handleView = (doc) => {
+  const handleView = async (doc) => {
     try {
-      const linkSource = doc.content;
+      const { fileUrl, title } = await getDocument(doc._id);
       const downloadLink = document.createElement("a");
-      downloadLink.href = linkSource;
-      downloadLink.download = doc.name;
+      downloadLink.href = fileUrl;
+      downloadLink.download = title;
       downloadLink.click();
     } catch (error) {
       console.error('Error viewing document:', error);
@@ -152,7 +122,7 @@ const Documents = () => {
               Upload Documents
             </label>
             <p className="upload-info">
-              Supported formats: PDF, DOC, DOCX, TXT, XLS, XLSX, JPG, JPEG, PNG (Max 5MB)
+              Supported formats: PDF, DOC, DOCX, TXT, XLS, XLSX, JPG, JPEG, PNG (Max 3MB)
             </p>
           </div>
         </div>
@@ -175,10 +145,10 @@ const Documents = () => {
               </thead>
               <tbody>
                 {documents.map(doc => (
-                  <tr key={doc.id}>
-                    <td>{doc.name}</td>
-                    <td>{doc.type}</td>
-                    <td>{formatFileSize(doc.size)}</td>
+                  <tr key={doc._id}>
+                    <td>{doc.title}</td>
+                    <td>{doc.fileType}</td>
+                    <td>{formatFileSize(doc.fileSize)}</td>
                     <td>{formatDate(doc.uploadDate)}</td>
                     <td>
                       <button
@@ -188,7 +158,7 @@ const Documents = () => {
                         View
                       </button>
                       <button
-                        onClick={() => handleDelete(doc.id)}
+                        onClick={() => handleDelete(doc._id)}
                         className="delete-btn"
                       >
                         Delete

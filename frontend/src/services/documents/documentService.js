@@ -1,58 +1,31 @@
-import axios from 'axios';
-import { BASE_URL } from '../../utils/url';
+import axiosInstance from '../axiosInstance';
 
-const API_URL = `${BASE_URL}/documents`;
-
-// Upload document
-export const uploadDocument = async (formData) => {
-    const token = localStorage.getItem('token');
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-        }
-    };
-
-    const response = await axios.post(API_URL, formData, config);
-    return response.data;
+// Upload document (file content is sent as a base64 data URL)
+export const uploadDocument = async ({ name, type, size, content }) => {
+  const response = await axiosInstance.post('/documents', {
+    title: name,
+    description: name,
+    fileUrl: content,
+    fileType: type || 'application/octet-stream',
+    fileSize: size
+  });
+  return response.data.data;
 };
 
-// Get user's documents
+// Get user's documents (without file contents)
 export const getDocuments = async () => {
-    const token = localStorage.getItem('token');
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    };
-
-    const response = await axios.get(API_URL, config);
-    return response.data;
+  const response = await axiosInstance.get('/documents');
+  return response.data.data.documents;
 };
 
-// Download document
-export const downloadDocument = async (documentId) => {
-    const token = localStorage.getItem('token');
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`
-        },
-        responseType: 'blob'
-    };
-
-    const response = await axios.get(`${API_URL}/${documentId}`, config);
-    return response.data;
+// Get a single document including its file contents
+export const getDocument = async (documentId) => {
+  const response = await axiosInstance.get(`/documents/${documentId}`);
+  return response.data.data;
 };
 
 // Delete document
 export const deleteDocument = async (documentId) => {
-    const token = localStorage.getItem('token');
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    };
-
-    const response = await axios.delete(`${API_URL}/${documentId}`, config);
-    return response.data;
+  const response = await axiosInstance.delete(`/documents/${documentId}`);
+  return response.data.data;
 };

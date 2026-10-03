@@ -24,7 +24,9 @@ const documentController = {
 
   // Get all documents for a user
   getAll: asyncHandler(async (req, res) => {
+    // File contents are fetched one at a time via getOne, so leave them out of the list
     const documents = await Document.find({ user: req.user })
+      .select("-fileUrl")
       .sort({ uploadDate: -1 });
 
     // Get storage statistics

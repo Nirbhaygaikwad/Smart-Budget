@@ -23,18 +23,12 @@ const Dashboard = () => {
     try {
       const response = await transactionService.getAllTransactions();
       if (response?.status === 'success') {
-        // Calculate summary from transactions
-        const transactions = response.data || [];
-        const summary = transactions.reduce((acc, trans) => {
-          if (trans.type === 'income') {
-            acc.totalIncome += trans.amount;
-          } else {
-            acc.totalExpenses += trans.amount;
-          }
-          return acc;
-        }, { totalIncome: 0, totalExpenses: 0 });
-        
-        summary.balance = summary.totalIncome - summary.totalExpenses;
+        const { transactions, summary: totals } = response.data;
+        const summary = {
+          totalIncome: totals.income,
+          totalExpenses: totals.expenses,
+          balance: totals.balance
+        };
 
         setData({
           transactions,
