@@ -12,6 +12,7 @@ import {
   Pie,
   Cell
 } from 'recharts';
+import transactionService from '../../../src/services/transactions/transactionService';
 import './Dashboard.css';
 
 const CATEGORIES = {
@@ -30,48 +31,18 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadTransactions();
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
   }, []);
 
-  const handleStorageChange = (e) => {
-    const currentUser = localStorage.getItem('user');
-    if (!currentUser) return;
-
-    const userTransactionsKey = `transactions_${JSON.parse(currentUser).id}`;
-    if (e.key === userTransactionsKey) {
-      loadTransactions();
-    }
-  };
-
-  const loadTransactions = () => {
+  const loadTransactions = async () => {
     try {
-      const currentUser = localStorage.getItem('user');
-      if (!currentUser) {
-        setLoading(false);
-        return;
-      }
+      const response = await transactionService.getAllTransactions();
+      const transactionsData = response?.data?.transactions || [];
 
-      const userTransactionsKey = `transactions_${JSON.parse(currentUser).id}`;
-      const storedTransactions = localStorage.getItem(userTransactionsKey);
-      let transactionsData = [];
-      
-      if (storedTransactions) {
-        transactionsData = JSON.parse(storedTransactions);
-      }
-
-      // Sort transactions by date in descending order (most recent first)
-      const sortedTransactions = transactionsData.sort((a, b) => 
-        new Date(b.date) - new Date(a.date)
-      );
-
-      setTransactions(sortedTransactions);
-      calculateSummary(sortedTransactions);
-      setLoading(false);
+      setTransactions(transactionsData);
+      calculateSummary(transactionsData);
     } catch (error) {
       console.error('Error loading transactions:', error);
+    } finally {
       setLoading(false);
     }
   };

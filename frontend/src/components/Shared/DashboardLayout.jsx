@@ -12,6 +12,7 @@ const DashboardLayout = ({ children }) => {
     e.preventDefault();
     
     // Clear user session and form data
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
     
     // Clear browser form data
